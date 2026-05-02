@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import Asymmetric from './components/Asymmetric';
+>>>>>>> quanghieu
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { AppShell, Burger, Group, Text, NavLink as MantineNavLink, Title, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -74,7 +78,11 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/symmetric" element={<Symmetric />} />
             {/* Tạo file dummy cho 2 trang còn lại để test điều hướng */}
+<<<<<<< HEAD
             <Route path="/asymmetric" element={<div p="xl"><Title>Asymmetric (Member 3)</Title></div>} />
+=======
+            <Route path="/asymmetric" element={<Asymmetric />} />
+>>>>>>> quanghieu
             <Route path="/hash" element={<div p="xl"><Title>Hashing (Member 4)</Title></div>} />
           </Routes>
         </AppShell.Main>
