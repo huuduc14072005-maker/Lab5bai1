@@ -1,4 +1,5 @@
 import Asymmetric from './components/Asymmetric';
+
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { AppShell, Burger, Group, Text, NavLink as MantineNavLink, Title, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -9,10 +10,11 @@ import { Home as HomeIcon, ShieldCheck, KeyRound, Hash as HashIcon } from 'lucid
 // BẮT BUỘC PHẢI CÓ 2 DÒNG NÀY ĐỂ KÉO GIAO DIỆN CÁC TRANG VÀO:
 import Home from './pages/Home';
 import Symmetric from './pages/Symmetric';
+import Hashing from './pages/Hashing';
 
 // Sửa lại dòng 10 trong mảng navLinks:
 const navLinks = [
-  { link: '/', label: 'Main Menu', icon: HomeIcon }, // Đổi icon: Home thành icon: HomeIcon
+  { link: '/', label: 'Main Menu', icon: HomeIcon },
   { link: '/symmetric', label: '1. Symmetric Encryption', icon: ShieldCheck },
   { link: '/asymmetric', label: '2. Asymmetric Encryption', icon: KeyRound },
   { link: '/hash', label: '3. Hash Functions', icon: HashIcon },
@@ -41,10 +43,10 @@ function App() {
         <AppShell.Navbar p="md">
           <AppShell.Section grow component={ScrollArea}>
             {navLinks.map((item) => (
-              <NavLink 
-                to={item.link} 
-                key={item.label} 
-                style={{textDecoration: 'none'}}
+              <NavLink
+                to={item.link}
+                key={item.label}
+                style={{ textDecoration: 'none' }}
               >
                 {({ isActive }) => (
                   <MantineNavLink
@@ -63,9 +65,11 @@ function App() {
               </NavLink>
             ))}
           </AppShell.Section>
-          
+
           <AppShell.Section borderTop="1px solid var(--mantine-color-default-border)" pt="md">
-            <Text size="xs" c="dimmed" ta="center">Fit Project - Class 2024</Text>
+            <Text size="xs" c="dimmed" ta="center">
+              Fit Project - Class 2024
+            </Text>
           </AppShell.Section>
         </AppShell.Navbar>
 
@@ -74,9 +78,14 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/symmetric" element={<Symmetric />} />
+
             {/* Tạo file dummy cho 2 trang còn lại để test điều hướng */}
+            <Route path="/asymmetric" element={<div p="xl"><Title>Asymmetric (Member 3)</Title></div>} />
+            <Route path="/hash" element={<Hashing />} />  
+
             <Route path="/asymmetric" element={<Asymmetric />} />
             <Route path="/hash" element={<div p="xl"><Title>Hashing (Member 4)</Title></div>} />
+
           </Routes>
         </AppShell.Main>
       </AppShell>
