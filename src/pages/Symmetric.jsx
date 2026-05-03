@@ -1,69 +1,79 @@
+// src/pages/Symmetric.jsx
 import { useState } from 'react';
-import axios from 'axios';
-import { Title, Container, Paper, Group, Text, Select, TextInput, Textarea, Button, SegmentedControl, ActionIcon, CopyButton, rem } from '@mantine/core';
-import { ShieldCheck, Clipboard, Zap } from 'lucide-react';
+import {
+  Title,
+  Container,
+  Paper,
+  Group,
+  Text,
+  Select,
+  TextInput,
+  Textarea,
+  Button,
+  SegmentedControl,
+  ActionIcon,
+  CopyButton,
+  rem,
+  Alert,
+  SimpleGrid
+} from '@mantine/core';
+
+import { ShieldCheck, Clipboard, Zap, AlertCircle } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 
+import { generateRandomKey, symmetricProcess } from '../utils/symmetricCrypto';
+
 function Symmetric() {
-  // State quản lý dữ liệu nhập liệu
   const [algorithm, setAlgorithm] = useState('AES');
-  const [mode, setMode] = useState('CBC');
-  const [action, setAction] = useState('encrypt'); // 'encrypt' hoặc 'decrypt'
-  
+  const [action, setAction] = useState('encrypt');
+
   const [inputText, setInputText] = useState('');
   const [key, setKey] = useState('');
-  
+
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Hàm gọi API auto-generate key (Gọi API của Member 2)
-  const handleGenerateKey = async () => {
-    try {
-      // Giả lập gọi API Backend (sẽ thay bằng axios.get...)
-      // const response = await axios.get(`http://localhost:5000/api/symmetric/generate-key?algo=${algorithm}`);
-      // setKey(response.data.key);
-      
-      const mockKey = algorithm === 'AES' ? 'random_aes_key_32_bytes' : 'random_des_key_8_bytes';
-      setKey(mockKey);
-      setError('');
-      notifications.show({ title: 'Thành công!', message: 'Đã tạo khóa ngẫu nhiên mới!', color: 'teal', icon: <KeyRound size={18} /> });
-    } catch (err) {
-      setError('Lỗi khi tạo khóa ngẫu nhiên');
-    }
+  const handleGenerateKey = () => {
+    const result = generateRandomKey(algorithm);
+    setKey(result.key);
+    notifications.show({
+      title: 'Thành công!',
+      message: `Đã tạo khóa ${algorithm} (${result.key.length * 4} bits)`,
+      color: 'teal',
+    });
   };
 
-  // Hàm thực thi Mã hóa/Giải mã
-  const handleExecute = async () => {
-    if (!inputText || !key) {
-      setError('Vui lòng nhập đầy đủ Dữ liệu và Khóa!');
+  const handleExecute = () => {
+    if (!inputText.trim()) {
+      setError('Vui lòng nhập dữ liệu!');
       return;
     }
-    
+    if (!key) {
+      setError('Vui lòng tạo hoặc nhập Secret Key!');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setOutputText('');
 
-    try {
-      // Gọi API Backend thực tế (Member 2 viết):
-      /*
-      const response = await axios.post('http://localhost:5000/api/symmetric/process', {
-        action: action, algorithm: algorithm, mode: mode, text: inputText, key: key
-      });
-      setOutputText(response.data.result);
-      */
+    const result = symmetricProcess(action, algorithm, 'ECB', inputText, key);
 
-      // Mock data hiển thị tạm thời:
-      setTimeout(() => {
-        setOutputText(action === 'encrypt' ? 'Mocked_Encrypted_Ciphertext_Base64' : 'Mocked_Decrypted_Plaintext');
-        setIsLoading(false);
-      }, 700);
-
-    } catch (err) {
-      // Bắt lỗi do Member 4 trả về từ Backend
-      setError(err.response?.data?.error || 'Đã có lỗi xảy ra.');
+    setTimeout(() => {
+      if (result.success) {
+        setOutputText(result.result);
+        notifications.show({
+          title: action === 'encrypt' ? 'Mã hóa thành công' : 'Giải mã thành công',
+          message: result.algorithm,
+          color: 'green',
+        });
+      } else {
+        setError(result.error);
+        notifications.show({ title: 'Lỗi', message: result.error, color: 'red' });
+      }
       setIsLoading(false);
-    }
+    }, 600);
   };
 
   return (
@@ -74,90 +84,94 @@ function Symmetric() {
       </Group>
 
       <Paper shadow="md" radius="md" padding="xl" withBorder>
-        {/* --- Bước 2: Select Algorithm --- */}
         <SimpleGrid cols={{ base: 1, md: 2 }} mb="xl">
-          <Select 
-            label="1. Chọn Thuật toán"
-            data={['DES', '3DES', 'AES']}
+          <Select
+            label="1. Thuật toán"
+            data={['AES', '3DES', 'DES']}
             value={algorithm}
             onChange={setAlgorithm}
-            allowDeselect={false}
           />
-          <Select 
-            label="Chế độ hoạt động (Mode)"
-            data={['ECB', 'CBC']}
-            value={mode}
-            onChange={setMode}
-            allowDeselect={false}
+          <Select
+            label="Chế độ (Mode)"
+            data={['ECB']}
+            value="ECB"
+            disabled
           />
         </SimpleGrid>
 
-        {/* --- Chọn Encrypt / Decrypt Tab --- */}
         <Group ta="center" mb="lg">
-          <SegmentedControl 
+          <SegmentedControl
             fullWidth
             size="md"
             color="blue"
-            value={action} 
-            onChange={setAction} 
+            value={action}
+            onChange={setAction}
             data={[
               { label: '🔓 Encrypt', value: 'encrypt' },
               { label: '🔐 Decrypt', value: 'decrypt' },
-            ]} 
+            ]}
           />
         </Group>
 
-        {/* --- Bước 3: Input Data --- */}
-        <Textarea 
-          label={`2. ${action === 'encrypt' ? 'Plaintext' : 'Ciphertext'}:`}
-          placeholder={`Nhập ${action === 'encrypt' ? 'văn bản' : 'mã hóa'} của bạn...`}
+        <Textarea
+          label={`2. ${action === 'encrypt' ? 'Plaintext' : 'Ciphertext'}`}
+          placeholder="Nhập nội dung..."
           rows={5}
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={(e) => setInputText(e.currentTarget.value)}
           mb="lg"
-          error={inputText === '' && error ? true : false}
         />
 
-        {/* --- Bước 4: Key Management --- */}
-        <TextInput 
-          label="3. Secret Key:"
-          placeholder="Nhập khóa bí mật của bạn..."
+        <TextInput
+          label="3. Secret Key (Hex)"
+          placeholder="Nhấn Auto Generate để tạo khóa..."
           value={key}
-          onChange={(e) => setKey(e.target.value)}
-          error={error}
+          onChange={(e) => setKey(e.currentTarget.value)}
           mb="xl"
-          rightSectionWidth={170}
+          rightSectionWidth={160}
           rightSection={
-            <Button.Group>
-              <Button onClick={handleGenerateKey} variant="light" color="blue" leftSection={<Zap size={14} />}>Auto-generate</Button>
-            </Button.Group>
+            <Button 
+              onClick={handleGenerateKey} 
+              variant="light" 
+              color="blue" 
+              leftSection={<Zap size={16} />}
+            >
+              Auto Generate
+            </Button>
           }
         />
 
-       {/* --- Bước 5: Execute --- */}
-        <Button onClick={handleExecute} fullWidth size="md" color="blue" loading={isLoading}>
-          {`Execute ${action.toUpperCase()}`}
+        <Button
+          onClick={handleExecute}
+          fullWidth
+          size="md"
+          color="blue"
+          loading={isLoading}
+        >
+          {action === 'encrypt' ? '🔒 Mã hóa' : '🔓 Giải mã'}
         </Button>
 
-        {/* --- Output --- */}
+        {error && (
+          <Alert icon={<AlertCircle size={16} />} color="red" mt="md" title="Lỗi">
+            {error}
+          </Alert>
+        )}
+
         {outputText && (
           <Paper shadow="sm" radius="md" padding="md" withBorder mt="xl">
-            <Textarea 
-              label="Kết quả (Output):"
-              value={outputText}
-              readOnly
-              rows={4}
-              variant="filled"
-              rightSection={
-                <CopyButton value={outputText}>
-                  {({ copied, copy }) => (
-                    <ActionIcon onClick={copy} variant="filled" color={copied ? 'teal' : 'gray'} mt={60} mr={15}>
-                      <Clipboard style={{ width: rem(18), height: rem(18) }} />
-                    </ActionIcon>
-                  )}
-                </CopyButton>
-              }
-            />
+            <Group position="apart" mb={8}>
+              <Text fw={500}>
+                Kết quả ({action === 'encrypt' ? 'Ciphertext' : 'Plaintext'}):
+              </Text>
+              <CopyButton value={outputText}>
+                {({ copied, copy }) => (
+                  <ActionIcon color={copied ? 'teal' : 'gray'} onClick={copy}>
+                    <Clipboard size={rem(18)} />
+                  </ActionIcon>
+                )}
+              </CopyButton>
+            </Group>
+            <Textarea value={outputText} readOnly rows={6} variant="filled" />
           </Paper>
         )}
       </Paper>
