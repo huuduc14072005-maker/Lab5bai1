@@ -8,6 +8,7 @@ import { Home as HomeIcon, ShieldCheck, KeyRound, Hash as HashIcon } from 'lucid
 // BẮT BUỘC PHẢI CÓ 2 DÒNG NÀY ĐỂ KÉO GIAO DIỆN CÁC TRANG VÀO:
 import Home from './pages/Home';
 import Symmetric from './pages/Symmetric';
+import Hashing from './pages/Hashing';
 
 // Sửa lại dòng 10 trong mảng navLinks:
 const navLinks = [
@@ -75,7 +76,7 @@ function App() {
             <Route path="/symmetric" element={<Symmetric />} />
             {/* Tạo file dummy cho 2 trang còn lại để test điều hướng */}
             <Route path="/asymmetric" element={<div p="xl"><Title>Asymmetric (Member 3)</Title></div>} />
-            <Route path="/hash" element={<div p="xl"><Title>Hashing (Member 4)</Title></div>} />
+            <Route path="/hash" element={<Hashing />} />  
           </Routes>
         </AppShell.Main>
       </AppShell>
