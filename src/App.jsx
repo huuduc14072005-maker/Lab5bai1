@@ -1,5 +1,3 @@
-import Asymmetric from './components/Asymmetric';
-
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { AppShell, Burger, Group, Text, NavLink as MantineNavLink, Title, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -7,12 +5,12 @@ import { useDisclosure } from '@mantine/hooks';
 // Import Icon từ lucide-react (Lưu ý: dùng Home as HomeIcon để không bị trùng)
 import { Home as HomeIcon, ShieldCheck, KeyRound, Hash as HashIcon } from 'lucide-react';
 
-// BẮT BUỘC PHẢI CÓ 2 DÒNG NÀY ĐỂ KÉO GIAO DIỆN CÁC TRANG VÀO:
+// Import các component/pages
 import Home from './pages/Home';
 import Symmetric from './pages/Symmetric';
+import Asymmetric from './components/Asymmetric'; // Đã import đúng component Asymmetric
 import Hashing from './pages/Hashing';
 
-// Sửa lại dòng 10 trong mảng navLinks:
 const navLinks = [
   { link: '/', label: 'Main Menu', icon: HomeIcon },
   { link: '/symmetric', label: '1. Symmetric Encryption', icon: ShieldCheck },
@@ -78,14 +76,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/symmetric" element={<Symmetric />} />
-
-            {/* Tạo file dummy cho 2 trang còn lại để test điều hướng */}
-            <Route path="/asymmetric" element={<div p="xl"><Title>Asymmetric (Member 3)</Title></div>} />
-            <Route path="/hash" element={<Hashing />} />  
-
+            {/* Đã xóa các file dummy, chỉ giữ lại Route chuẩn */}
             <Route path="/asymmetric" element={<Asymmetric />} />
-            <Route path="/hash" element={<div p="xl"><Title>Hashing (Member 4)</Title></div>} />
-
+            <Route path="/hash" element={<Hashing />} />  
           </Routes>
         </AppShell.Main>
       </AppShell>

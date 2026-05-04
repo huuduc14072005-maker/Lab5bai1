@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Container, Title, Group, Button, Textarea, Text, Paper } from '@mantine/core';
 
 export default function Asymmetric() {
   const [publicKey, setPublicKey] = useState(null);
@@ -96,44 +97,57 @@ export default function Asymmetric() {
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: "auto" }}>
-      <h2>🔐 Asymmetric Encryption (RSA)</h2>
+    <Container size="md" py="xl">
+      <Paper withBorder p="xl" radius="md" shadow="sm">
+        <Title order={2} mb="lg" c="blue.7">
+          🔐 Asymmetric Encryption (RSA)
+        </Title>
 
-      {/* BUTTONS */}
-      <div style={{ marginBottom: 10 }}>
-        <button onClick={generateKeys}>🔑 Generate Key</button>{" "}
-        <button onClick={encrypt}>🔒 Encrypt</button>{" "}
-        <button onClick={decrypt}>🔓 Decrypt</button>
-      </div>
+        {/* BUTTONS */}
+        <Group mb="md">
+          <Button color="teal" onClick={generateKeys} variant="light">
+            🔑 Generate Key
+          </Button>
+          <Button color="blue" onClick={encrypt} variant="filled">
+            🔒 Encrypt
+          </Button>
+          <Button color="grape" onClick={decrypt} variant="filled">
+            🔓 Decrypt
+          </Button>
+        </Group>
 
-      {/* STATUS */}
-      {status && (
-        <div style={{ marginBottom: 10, color: "blue" }}>
-          {status}
-        </div>
-      )}
+        {/* STATUS */}
+        {status && (
+          <Text 
+            fw={500} 
+            mb="md" 
+            c={status.includes("❌") || status.includes("⚠️") ? "red" : "teal"}
+          >
+            {status}
+          </Text>
+        )}
 
-      {/* PLAINTEXT */}
-      <div>
-        <label>Plaintext:</label>
-        <textarea
-          style={{ width: "100%", height: 80 }}
+        {/* PLAINTEXT */}
+        <Textarea
+          label="Plaintext:"
           placeholder="Nhập nội dung..."
           value={plainText}
           onChange={(e) => setPlainText(e.target.value)}
+          minRows={4}
+          mb="md"
+          autosize
         />
-      </div>
 
-      {/* CIPHERTEXT */}
-      <div>
-        <label>Ciphertext (Base64):</label>
-        <textarea
-          style={{ width: "100%", height: 80 }}
+        {/* CIPHERTEXT */}
+        <Textarea
+          label="Ciphertext (Base64):"
           placeholder="Kết quả mã hóa..."
           value={cipherText}
           onChange={(e) => setCipherText(e.target.value)}
+          minRows={4}
+          autosize
         />
-      </div>
-    </div>
+      </Paper>
+    </Container>
   );
 }
